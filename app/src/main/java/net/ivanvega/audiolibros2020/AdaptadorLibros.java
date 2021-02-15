@@ -14,6 +14,7 @@ import java.util.Vector;
 
 public class AdaptadorLibros extends  RecyclerView.Adapter<AdaptadorLibros.ViewHolder> {
     //calando si jala
+    String nada;
     private  Vector<Libro> vectorLibros;
     private  Context contexto;
     private  LayoutInflater inflador;
