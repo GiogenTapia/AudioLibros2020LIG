@@ -108,17 +108,33 @@ public class DetalleFragment extends Fragment
         ponInfoLibro(id, getView());
     }
 
+
+
     ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             MiServicio.MiServicioBinder miServicioBinder =
                     (MiServicio.MiServicioBinder) iBinder ;
-             miServicio =
+            miServicio =
                     miServicioBinder.getService();
 
+            mediaPlayer = miServicio.getMediaPlayer();
+            mediaController.setMediaPlayer(DetalleFragment.this);
+            mediaController.setAnchorView(getView());
+            mediaController.setEnabled(true);
+            mediaController.show();
+
+            mediaPlayer.setOnCompletionListener(mediaPlayer1 -> {
+                Log.d("Completado", "Se llamó");
+                // mediaPlayer.stop();
+                getContext().unbindService(serviceConnection);
+                miServicio.stopForeground(true);
+               getContext().stopService(iSer);
+
+            });
             Log.d("MSE", "GFrameno enlazado al seervicio " + componentName);
 
-             int randf =  miServicio.getRandomNumber();
+            int randf =  miServicio.getRandomNumber();
             Log.d("MSE", "Peticion  al servicio " + randf);
 
         }
@@ -128,43 +144,42 @@ public class DetalleFragment extends Fragment
 
         }
     };
-
+    Uri audio;
     private void ponInfoLibro(int id, View vista) {
-
-        //servicio iniciado
-        //servicio de primer plano
-        iSer = new Intent(getContext(), MiServicio.class);
-        getActivity().startService(iSer);
-
-        getActivity().bindService(iSer, serviceConnection, Context.BIND_AUTO_CREATE);
-
-        Intent miIS = new Intent(getContext(), MiIntentService.class);
-        getActivity().startService(miIS);
-
-
-
         Libro libro =
                 Libro.ejemploLibros().elementAt(id);
         ((TextView) vista.findViewById(R.id.titulo)).setText(libro.titulo);
         ((TextView) vista.findViewById(R.id.autor)).setText(libro.autor);
         ((ImageView) vista.findViewById(R.id.portada)).setImageResource(libro.recursoImagen);
-
         vista.setOnTouchListener(this);
-
-        if (mediaPlayer != null){
+      /*  if (mediaPlayer != null){
             mediaPlayer.release();
         }
+
+
         mediaPlayer = new MediaPlayer();
-        mediaPlayer.setOnPreparedListener(this);
+        mediaPlayer.setOnPreparedListener(this); */
+
+
         mediaController = new MediaController(getActivity());
-        Uri audio = Uri.parse(libro.urlAudio);
+        audio = Uri.parse(libro.urlAudio);
+
+        iSer = new Intent(getContext(), MiServicio.class);
+        iSer.putExtra("Audio", audio.toString());
+        getActivity().startService(iSer);
+
+        //servicio iniciado
+        //servicio de primer plano
+        getActivity().bindService(iSer, serviceConnection, Context.BIND_AUTO_CREATE);
+
+        /*
         try {
             mediaPlayer.setDataSource(getActivity(), audio);
             mediaPlayer.prepareAsync();
         } catch (IOException e) {
             Log.e("Audiolibros", "ERROR: No se puede reproducir "+audio,e);
         }
-
+*/
 
 
 
@@ -174,15 +189,17 @@ public class DetalleFragment extends Fragment
     @Override
     public void onStop() {
         super.onStop();
-
+        mediaController.hide();
+/*
         mediaController.hide();
         try {
             mediaPlayer.stop();
             mediaPlayer.release();
+
         } catch (Exception e) {
             Log.d("Audiolibros", "Error en mediaPlayer.stop()");
         }
-
+*/
     }
 
         @Override
@@ -194,7 +211,6 @@ public class DetalleFragment extends Fragment
     @Override
     public void onPrepared(MediaPlayer mediaPlayer) {
         Log.d("Audiolibros", "Entramos en onPrepared de MediaPlayer");
-        mediaPlayer.start();
         mediaController.setMediaPlayer(this);
         mediaController.setAnchorView(getView());
         mediaController.setEnabled(true);
@@ -203,20 +219,22 @@ public class DetalleFragment extends Fragment
 
     @Override
     public void start() {
+
         mediaPlayer.start();
     }
 
     @Override
     public void pause() {
         mediaPlayer.pause();
-        int randf =  miServicio.getRandomNumber();
-        Log.d("MSE", "Peticion  al servicio " + randf);
+      //  int randf =  miServicio.getRandomNumber();
+        //Log.d("MSE", "Peticion  al servicio " + randf);
     }
 
     @Override
     public int getDuration() {
         return mediaPlayer.getDuration();
     }
+
 
     @Override
     public int getCurrentPosition() {
@@ -262,4 +280,6 @@ public class DetalleFragment extends Fragment
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
     }
+
+
 }

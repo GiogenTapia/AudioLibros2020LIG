@@ -6,11 +6,15 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.MediaController;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -18,12 +22,15 @@ import androidx.annotation.RequiresApi;
 import net.ivanvega.audiolibros2020.MainActivity;
 import net.ivanvega.audiolibros2020.R;
 
+import java.io.IOException;
+import java.net.URI;
 import java.util.Random;
 
 public class MiServicio extends Service {
 
     // Binder given to clients
     private final IBinder binder = new MiServicioBinder();
+    private MediaPlayer mediaPlayer;
     // Random number generator
     private final Random mGenerator = new Random();
 
@@ -52,10 +59,20 @@ public class MiServicio extends Service {
 
     @Override
     public void onCreate() {
+
+
         super.onCreate();
 
         Log.d("MSAL", "servicio creado");
 
+
+
+
+
+    }
+
+    public MediaPlayer getMediaPlayer(){
+        return mediaPlayer;
     }
 
     private String CHANNEL_ID="CANALID";
@@ -72,6 +89,7 @@ public class MiServicio extends Service {
             // or other notification behaviors after this
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
+
         }
     }
 
@@ -83,12 +101,24 @@ public class MiServicio extends Service {
 
         //startForeground(10001, new Notication.builder()   );
 
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel();
             foregroundService();
         }
 
-        Log.d("MSAL", "Iniciando la tarea pesada ");
+        Uri uri = Uri.parse(intent.getStringExtra("Audio"));
+
+        mediaPlayer = MediaPlayer.create(getApplicationContext(),uri);
+        mediaPlayer.start();
+     /*
+
+      */
+
+
+
+        Log.d("MSAL", "Iniciando la tarea pesada "+uri);
+        /*
         try {
             Thread.sleep(5000);
 
@@ -131,14 +161,16 @@ public class MiServicio extends Service {
             };
 
             task.execute(1,2,3,4);
-            
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+         */
         //stopSelf();
         Log.d("MSAL", "Tarea pesada finalizada");
 
-        return super.onStartCommand(intent, flags, startId);
+        return START_STICKY;
     }
 
 
@@ -168,9 +200,15 @@ public class MiServicio extends Service {
 
 
 
+
+
     @Override
     public void onDestroy() {
+
         super.onDestroy();
-        Log.d("MSAL", "Servicio destruido");
+        stopSelf();
+        Log.d("Completo", "Servicio destruido");
+
+
     }
 }
