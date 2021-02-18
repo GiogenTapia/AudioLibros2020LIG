@@ -19,6 +19,7 @@ import android.widget.MediaController;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
+import net.ivanvega.audiolibros2020.DetalleFragment;
 import net.ivanvega.audiolibros2020.MainActivity;
 import net.ivanvega.audiolibros2020.R;
 
@@ -31,6 +32,7 @@ public class MiServicio extends Service {
     // Binder given to clients
     private final IBinder binder = new MiServicioBinder();
     private MediaPlayer mediaPlayer;
+    int libroId;
     // Random number generator
     private final Random mGenerator = new Random();
 
@@ -101,14 +103,13 @@ public class MiServicio extends Service {
 
         //startForeground(10001, new Notication.builder()   );
 
-
+        libroId = intent.getIntExtra("id",0);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel();
             foregroundService();
         }
 
         Uri uri = Uri.parse(intent.getStringExtra("Audio"));
-
         mediaPlayer = MediaPlayer.create(getApplicationContext(),uri);
         mediaPlayer.start();
      /*
@@ -178,7 +179,7 @@ public class MiServicio extends Service {
     private void foregroundService() {
 
         Intent notificationIntent = new Intent(this, MainActivity.class);
-        notificationIntent.putExtra("rep", "Servicio Primer plano");
+        notificationIntent.putExtra("rep", libroId);
 
 
         PendingIntent pendingIntent =
@@ -186,7 +187,7 @@ public class MiServicio extends Service {
 
         Notification notification =
                 new Notification.Builder(this, CHANNEL_ID)
-                        .setContentTitle("Titulo")
+                        .setContentTitle("Libro Reproduciendo")
                         .setContentText("Servicio en ejecucion")
                         .setSmallIcon(R.drawable.ic_launcher_background)
                         .setContentIntent(pendingIntent)
@@ -204,9 +205,7 @@ public class MiServicio extends Service {
 
     @Override
     public void onDestroy() {
-
         super.onDestroy();
-        stopSelf();
         Log.d("Completo", "Servicio destruido");
 
 

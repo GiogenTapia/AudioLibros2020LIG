@@ -27,23 +27,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-        //AQUI REVISO SI LE MANDARON PARAMETROS A ESTA ACTIVIDAD
-        //EN ESPECIAL REVISO SI LA ACTIVIDAD LA INVOCO LA NOTIFICACION LANZADA POR EL SERVICIO DE PRIMER PLANO
-        //
-        if(getIntent().getExtras()!=null){
-            Log.d("MSPPN", getIntent().getExtras().getString("rep","no se encontro parametro"));
+        SelectorFragment selectorFragment = new SelectorFragment();
+
+        if (findViewById(R.id.contenedor_pequeno) != null && getSupportFragmentManager().findFragmentById(R.id.contenedor_pequeno) == null){
+            getSupportFragmentManager().beginTransaction().add(R.id.contenedor_pequeno, selectorFragment).commit();
         }
 
-
-        SelectorFragment selectorFragment
-                = new SelectorFragment();
-
-        if ( findViewById(R.id.contenedor_pequeno) != null    &&
-            getSupportFragmentManager().findFragmentById(R.id.contenedor_pequeno) == null
-        ){
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.contenedor_pequeno,
-                            selectorFragment).commit();
+        if(getIntent().getExtras()!=null) {
+            Log.d("App", "onCreate: Se inició con Intent: " + getIntent().getIntExtra("rep", 0));
+            mostrarDetallenotif(getIntent().getIntExtra("rep", 0));
+        } else {
+            Log.d("App", "Aun no se envua nada");
         }
 
     }
@@ -79,6 +73,18 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+    public void mostrarDetallenotif(int index){
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        DetalleFragment detalleFragment = new DetalleFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt(DetalleFragment.ARG_ID_LIBRO, index);
+        bundle.putBoolean("Service", true);
+        detalleFragment.setArguments(bundle);
+        fragmentManager.beginTransaction().replace(R.id.contenedor_pequeno, detalleFragment).addToBackStack(null).commit();
+    }
+
+
 
 
 }

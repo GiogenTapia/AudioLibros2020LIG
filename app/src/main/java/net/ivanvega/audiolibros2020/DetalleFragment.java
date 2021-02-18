@@ -39,6 +39,7 @@ public class DetalleFragment extends Fragment
     MiServicio  miServicio;
     public static String ARG_ID_LIBRO = "id_libro";
 
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -88,14 +89,12 @@ public class DetalleFragment extends Fragment
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-       View vista = inflater.inflate(R.layout.fragment_detalle, container, false);
-
+        View vista = inflater.inflate(R.layout.fragment_detalle, container, false);
         Bundle args = getArguments();
-
-        if (args != null) {
+        if(args != null){
             int position = args.getInt(ARG_ID_LIBRO);
             ponInfoLibro(position, vista);
-        } else {
+        }else{
             ponInfoLibro(0, vista);
         }
 
@@ -122,7 +121,7 @@ public class DetalleFragment extends Fragment
             mediaController.setMediaPlayer(DetalleFragment.this);
             mediaController.setAnchorView(getView());
             mediaController.setEnabled(true);
-            mediaController.show();
+          //  mediaController.show();
 
             mediaPlayer.setOnCompletionListener(mediaPlayer1 -> {
                 Log.d("Completado", "Se llamó");
@@ -146,7 +145,7 @@ public class DetalleFragment extends Fragment
     };
     Uri audio;
     private void ponInfoLibro(int id, View vista) {
-        Libro libro =
+    Libro    libro =
                 Libro.ejemploLibros().elementAt(id);
         ((TextView) vista.findViewById(R.id.titulo)).setText(libro.titulo);
         ((TextView) vista.findViewById(R.id.autor)).setText(libro.autor);
@@ -160,17 +159,20 @@ public class DetalleFragment extends Fragment
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setOnPreparedListener(this); */
 
-
         mediaController = new MediaController(getActivity());
         audio = Uri.parse(libro.urlAudio);
-
         iSer = new Intent(getContext(), MiServicio.class);
         iSer.putExtra("Audio", audio.toString());
-        getActivity().startService(iSer);
+        iSer.putExtra("id",id);
 
+
+        if (!getArguments().getBoolean("Service")){
+            getContext().startService(iSer);
+        }
         //servicio iniciado
         //servicio de primer plano
-        getActivity().bindService(iSer, serviceConnection, Context.BIND_AUTO_CREATE);
+        getContext().bindService(iSer, serviceConnection, Context.BIND_AUTO_CREATE);
+
 
         /*
         try {
@@ -188,8 +190,9 @@ public class DetalleFragment extends Fragment
 
     @Override
     public void onStop() {
-        super.onStop();
         mediaController.hide();
+        super.onStop();
+
 /*
         mediaController.hide();
         try {
@@ -219,7 +222,6 @@ public class DetalleFragment extends Fragment
 
     @Override
     public void start() {
-
         mediaPlayer.start();
     }
 
