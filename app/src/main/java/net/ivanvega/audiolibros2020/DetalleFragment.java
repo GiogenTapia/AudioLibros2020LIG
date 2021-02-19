@@ -173,15 +173,6 @@ public class DetalleFragment extends Fragment
         getContext().bindService(iSer, serviceConnection, Context.BIND_AUTO_CREATE);
 
 
-        /*
-        try {
-            mediaPlayer.setDataSource(getActivity(), audio);
-            mediaPlayer.prepareAsync();
-        } catch (IOException e) {
-            Log.e("Audiolibros", "ERROR: No se puede reproducir "+audio,e);
-        }
-*/
-
 
 
 
@@ -194,16 +185,7 @@ public class DetalleFragment extends Fragment
         getActivity().unbindService(serviceConnection);
         super.onStop();
 
-/*
-        mediaController.hide();
-        try {
-            mediaPlayer.stop();
-            mediaPlayer.release();
 
-        } catch (Exception e) {
-            Log.d("Audiolibros", "Error en mediaPlayer.stop()");
-        }
-*/
     }
 
         @Override
