@@ -126,10 +126,9 @@ public class DetalleFragment extends Fragment
             mediaPlayer.setOnCompletionListener(mediaPlayer1 -> {
                 Log.d("Completado", "Se llamó");
                 // mediaPlayer.stop();
-                getContext().unbindService(serviceConnection);
                 miServicio.stopForeground(true);
-               getContext().stopService(iSer);
-
+               getActivity().stopService(iSer);
+                getActivity().unbindService(serviceConnection);
             });
             Log.d("MSE", "GFrameno enlazado al seervicio " + componentName);
 
@@ -191,6 +190,8 @@ public class DetalleFragment extends Fragment
     @Override
     public void onStop() {
         mediaController.hide();
+        getActivity().stopService(iSer);
+        getActivity().unbindService(serviceConnection);
         super.onStop();
 
 /*

@@ -174,11 +174,11 @@ public class MiServicio extends Service {
         return START_STICKY;
     }
 
-
+    Intent notificationIntent;
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void foregroundService() {
 
-        Intent notificationIntent = new Intent(this, MainActivity.class);
+        notificationIntent = new Intent(this, MainActivity.class);
         notificationIntent.putExtra("rep", libroId);
 
 
@@ -205,9 +205,10 @@ public class MiServicio extends Service {
 
     @Override
     public void onDestroy() {
+        stopSelf();
+        notificationIntent = null;
         super.onDestroy();
         Log.d("Completo", "Servicio destruido");
-
 
     }
 }
