@@ -41,22 +41,22 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
-
+    DetalleFragment detalleFragment;
     public void mostrarDetalle(int index){
 
         FragmentManager fragmentManager = getSupportFragmentManager();
 
         if(fragmentManager.findFragmentById(R.id.detalle_fragment)!=null){
 
-            DetalleFragment fragment =
+         detalleFragment =
                     (DetalleFragment)
                     fragmentManager.findFragmentById(R.id.detalle_fragment);
 
-            fragment.ponInfoLibro(index);
+            detalleFragment.ponInfoLibro(index);
 
 
         }else{
-            DetalleFragment detalleFragment =
+            detalleFragment =
                     new DetalleFragment();
 
             Bundle bundle = new Bundle();
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void mostrarDetallenotif(int index){
         FragmentManager fragmentManager = getSupportFragmentManager();
-        DetalleFragment detalleFragment = new DetalleFragment();
+        detalleFragment = new DetalleFragment();
         Bundle bundle = new Bundle();
         bundle.putInt(DetalleFragment.ARG_ID_LIBRO, index);
         bundle.putBoolean("Service", true);
@@ -84,7 +84,9 @@ public class MainActivity extends AppCompatActivity {
         fragmentManager.beginTransaction().replace(R.id.contenedor_pequeno, detalleFragment).addToBackStack(null).commit();
     }
 
-
-
-
+    @Override
+    protected void onDestroy() {
+        detalleFragment.destruir();
+        super.onDestroy();
+    }
 }

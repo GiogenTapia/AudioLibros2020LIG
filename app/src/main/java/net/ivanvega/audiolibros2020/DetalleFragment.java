@@ -144,7 +144,7 @@ public class DetalleFragment extends Fragment
     };
     Uri audio;
     private void ponInfoLibro(int id, View vista) {
-    Libro    libro =
+        Libro libro =
                 Libro.ejemploLibros().elementAt(id);
         ((TextView) vista.findViewById(R.id.titulo)).setText(libro.titulo);
         ((TextView) vista.findViewById(R.id.autor)).setText(libro.autor);
@@ -162,27 +162,35 @@ public class DetalleFragment extends Fragment
         audio = Uri.parse(libro.urlAudio);
         iSer = new Intent(getContext(), MiServicio.class);
         iSer.putExtra("Audio", audio.toString());
-        iSer.putExtra("id",id);
+        iSer.putExtra("id", id);
 
 
-        if (!getArguments().getBoolean("Service")){
+        if (!getArguments().getBoolean("Service")) {
             getContext().startService(iSer);
         }
         //servicio iniciado
         //servicio de primer plano
         getContext().bindService(iSer, serviceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    public  void destruir(){
+        miServicio.stopForeground(true);
+        getContext().stopService(iSer);
+        getContext().unbindService(serviceConnection);
+
+    }
 
 
+    @Override
+    public void onDestroy() {
 
-
-
+        super.onDestroy();
     }
 
     @Override
     public void onStop() {
+
         mediaController.hide();
-        getActivity().stopService(iSer);
-        getActivity().unbindService(serviceConnection);
         super.onStop();
 
 
